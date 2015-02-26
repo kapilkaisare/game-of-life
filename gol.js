@@ -7,6 +7,7 @@ var WorldConfiguration = (function (){
 		rowId = 'rows',
 		colId = 'columns',
 		useBtnId = 'use-config',
+		useBtn = null,
 		_getRows = function () {
 			return num_rows;
 		},
@@ -32,7 +33,8 @@ var WorldConfiguration = (function (){
 			_readColCount();
 		},
 		_init = function (listeners) {
-			document.getElementById(useBtnId).onclick = listeners.useClick;
+			useBtn = document.getElementById(useBtnId);
+			useBtn.onclick = listeners.useClick;
 		};
 
 	return {
@@ -41,6 +43,29 @@ var WorldConfiguration = (function (){
 		loadCounts: _loadCounts,
 		getRows: _getRows,
 		getCols: _getCols,
+		init: _init
+	};
+})();
+
+
+var ActionPanel = (function () {
+	var
+		startBtnId = 'start',
+		startBtn = null,
+		stopBtnId = 'stop',
+		stopBtn = null,
+		resetBtnId = 'reset',
+		resetBtn = null,
+		_init = function () {
+			startBtn = document.getElementById(startBtnId);
+			stopBtn = document.getElementById(stopBtnId);
+			resetBtn = document.getElementById(resetBtnId);
+
+			startBtn.style.display = 'none';
+			stopBtn.style.display = 'none';
+			resetBtn.style.display = 'none';
+		};
+	return {
 		init: _init
 	};
 })();
@@ -71,14 +96,19 @@ var World = (function () {
 				return rowEl;
 			};
 
-		this.renderWorld = function (rows, cols) {
-			var
-				table = document.createElement('table'),
-				worldHolder = document.getElementById(renderContainerId);
-
-			while (worldHolder.firstChild) {
-				worldHolder.removeChild(worldHolder.firstChild);
+		this.clearWorld = function () {
+			if (this.worldHolder) {
+				while (this.worldHolder.firstChild) {
+					this.worldHolder.removeChild(this.worldHolder.firstChild);
+				}
 			}
+		};
+
+		this.renderWorld = function (rows, cols) {
+			var table = document.createElement('table');
+
+			this.worldHolder = document.getElementById(renderContainerId);
+			this.clearWorld();
 
 			for (var i = 1; i <= rows; i++) {
 				table.appendChild(renderRow(i, cols));
@@ -87,8 +117,8 @@ var World = (function () {
 			table.style.padding = '5px';
 			table.style.border = 'solid 1px';
 
-			worldHolder.appendChild(table);
-			
+			this.worldHolder.appendChild(table);
+
 		};
 
 		return this;
@@ -97,18 +127,19 @@ var World = (function () {
 
 var Gol = (function (){
 	var
-		_run = function (config, worldContainer) {
+		_run = function (config, action) {
 			var
 				onUseClick = function () {
 					var world = new World();
 					config.loadCounts();
 					world.renderWorld(config.getRows(), config.getCols());
 				},
-				listeners = {
+				configListeners = {
 					useClick: onUseClick
 				};
 
-			config.init(listeners);
+			config.init(configListeners);
+			action.init();
 		};
 
 	return {
@@ -116,4 +147,4 @@ var Gol = (function (){
 	};
 })();
 
-Gol.run(WorldConfiguration);
+Gol.run(WorldConfiguration, ActionPanel);
