@@ -3,6 +3,30 @@
 	{
 		"selected_items":
 		[
+			[
+				"use",
+				"useBtnId"
+			],
+			[
+				"_get",
+				"_getCols"
+			],
+			[
+				"default",
+				"default_cols"
+			],
+			[
+				"_",
+				"_readRowCount"
+			],
+			[
+				"row",
+				"rowInput"
+			],
+			[
+				"get",
+				"_getColCount"
+			]
 		]
 	},
 	"buffers":
@@ -19,7 +43,7 @@
 			"file": "gol.js",
 			"settings":
 			{
-				"buffer_size": 285,
+				"buffer_size": 1310,
 				"line_ending": "Unix"
 			}
 		}
@@ -152,15 +176,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 285,
+						"buffer_size": 1310,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								285,
-								285
+								1248,
+								1248
 							]
 						],
 						"settings":
