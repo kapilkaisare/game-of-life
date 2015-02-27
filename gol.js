@@ -56,21 +56,31 @@ var ActionPanel = (function () {
 		stopBtn = null,
 		resetBtnId = 'reset',
 		resetBtn = null,
+		_show = function () {
+			startBtn.style.display = 'inline';
+			stopBtn.style.display = 'inline';
+			resetBtn.style.display = 'inline';
+		},
+		_hide = function () {
+			startBtn.style.display = 'none';
+			stopBtn.style.display = 'none';
+			resetBtn.style.display = 'none';
+		},
 		_init = function () {
 			startBtn = document.getElementById(startBtnId);
 			stopBtn = document.getElementById(stopBtnId);
 			resetBtn = document.getElementById(resetBtnId);
 
-			startBtn.style.display = 'none';
-			stopBtn.style.display = 'none';
-			resetBtn.style.display = 'none';
+			this.hide();
 		};
 	return {
-		init: _init
+		init: _init,
+		hide: _hide,
+		show: _show
 	};
 })();
 
-var World = (function () {
+var World = (function (eventor) {
 	return function () {
 		var
 			renderContainerId = 'world-container',
@@ -85,6 +95,9 @@ var World = (function () {
 				cell.setAttribute('id', constructCellId(row, col));
 				cell.style.padding = '5px';
 				cell.style.border = 'solid 1px';
+				cell.onclick = function () {
+					eventor.fireEvent('cellToggled', row, col);
+				};
 				return cell;
 			},
 			renderRow = function (row, col) {
@@ -94,7 +107,16 @@ var World = (function () {
 					rowEl.appendChild(renderCell(row, i));
 				}
 				return rowEl;
+			},
+			onCellAlive = function (row, col) {
+				document.getElementById(constructCellId(row, col)).style.background = '#000000';
+			},
+			onCellDead = function (row, col) {
+				document.getElementById(constructCellId(row, col)).style.background = '#FFFFFF';
 			};
+
+		eventor.subscribeEvent('cellAlive', onCellAlive);
+		eventor.subscribeEvent('cellDead', onCellDead);
 
 		this.clearWorld = function () {
 			if (this.worldHolder) {
@@ -125,14 +147,59 @@ var World = (function () {
 	};
 })();
 
+var Eventor = (function () {
+
+	var events = {};
+
+	this.registerEvent = function (eventName) {
+		events[eventName] = {
+			subscriptions: []
+		}
+	};
+
+	this.subscribeEvent = function (eventName, func) {
+		if (events[eventName]) {
+			events[eventName].subscriptions.push(func);
+		}
+	};
+
+	this.fireEvent = function (eventName) {
+		if (events[eventName]) {
+			for (var i = 0, n = events[eventName].subscriptions.length; i < n; i++) {
+				events[eventName].subscriptions[i]();
+			}
+		}
+	};
+
+	this.clearSubscriptions = function (eventName) {
+		if (events[eventName]) {
+			events[eventName].subscriptions = [];
+		}
+	};
+
+	return this;
+})();
+
 var Gol = (function (){
 	var
+		supportedEvents = [
+			'cellToggled',
+			'cellAlive',
+			'cellDead'
+		],
 		_run = function (config, action) {
+			var eventBridge = new Eventor();
+
+			for (var i = 0, n = supportedEvents.length; i < n; i++) {
+				eventBridge.registerEvent(supportedEvents[i]);
+			}
+
 			var
 				onUseClick = function () {
-					var world = new World();
+					var world = new World(eventBridge);
 					config.loadCounts();
 					world.renderWorld(config.getRows(), config.getCols());
+					action.show();
 				},
 				configListeners = {
 					useClick: onUseClick
