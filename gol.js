@@ -109,7 +109,6 @@ var World = (function () {
 				return rowEl;
 			},
 			onCellAlive = function (row, col) {
-				console.log('onCellAlive');
 				document.getElementById(constructCellId(row, col)).style.background = '#000000';
 			},
 			onCellDead = function (row, col) {
@@ -188,12 +187,42 @@ var Eventor = (function () {
 var Generation = (function () {
 	return function (eventor) {
 
-		var onCellToggled = function (row, col) {
-			console.log('onCellToggled');
-			eventor.fireEvent('cellAlive', row, col);
+		var State = function (initialState) {
+			this.isAlive = initialState || false;
+			return this;
 		};
 
+
+		var
+			that = this,
+			onCellToggled = function (row, col) {
+				if (that.state[row][col].isAlive) {
+					that.state[row][col].isAlive = false;
+					eventor.fireEvent('cellDead', row, col);
+				} else {
+					that.state[row][col].isAlive = true;
+					eventor.fireEvent('cellAlive', row, col);
+				}
+			},
+			makeRow = function (cols) {
+				var row = [];
+				for (var i = 0; i < cols; i++) {
+					row.push(new State(false));
+				}
+				return row;
+			};
+
 		eventor.subscribeEvent('cellToggled', onCellToggled);
+
+		this.state = null;
+
+		this.make = function (rows, cols) {
+				this.state = [];
+				for (var i = 0; i < cols; i++) {
+					this.state.push(makeRow(cols));
+				}
+		};
+
 		return this;
 	};
 })();
@@ -220,6 +249,7 @@ var Gol = (function (){
 					generation = new Generation(eventBridge);
 
 					config.loadCounts();
+					generation.make(config.getRows(), config.getCols());
 					world.renderWorld(config.getRows(), config.getCols());
 					action.show();
 				},
