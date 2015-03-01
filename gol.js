@@ -80,8 +80,8 @@ var ActionPanel = (function () {
 	};
 })();
 
-var World = (function (eventor) {
-	return function () {
+var World = (function () {
+	return function (eventor) {
 		var
 			renderContainerId = 'world-container',
 			constructCellId = function (row, col) {
@@ -96,6 +96,7 @@ var World = (function (eventor) {
 				cell.style.padding = '5px';
 				cell.style.border = 'solid 1px';
 				cell.onclick = function () {
+					console.log('onclick');
 					eventor.fireEvent('cellToggled', row, col);
 				};
 				return cell;
@@ -149,39 +150,56 @@ var World = (function (eventor) {
 
 var Eventor = (function () {
 
-	var events = {};
+	return function () {
+		var events = {};
 
-	this.registerEvent = function (eventName) {
-		events[eventName] = {
-			subscriptions: []
-		}
-	};
-
-	this.subscribeEvent = function (eventName, func) {
-		if (events[eventName]) {
-			events[eventName].subscriptions.push(func);
-		}
-	};
-
-	this.fireEvent = function (eventName) {
-		if (events[eventName]) {
-			for (var i = 0, n = events[eventName].subscriptions.length; i < n; i++) {
-				events[eventName].subscriptions[i]();
+		this.registerEvent = function (eventName) {
+			events[eventName] = {
+				subscriptions: []
 			}
-		}
+		};
+
+		this.subscribeEvent = function (eventName, func) {
+			if (events[eventName]) {
+				events[eventName].subscriptions.push(func);
+			}
+		};
+
+		this.fireEvent = function (eventName) {
+			if (events[eventName]) {
+				for (var i = 0, n = events[eventName].subscriptions.length; i < n; i++) {
+					events[eventName].subscriptions[i]();
+				}
+			}
+		};
+
+		this.clearSubscriptions = function (eventName) {
+			if (events[eventName]) {
+				events[eventName].subscriptions = [];
+			}
+		};
+
+		return this;
 	};
 
-	this.clearSubscriptions = function (eventName) {
-		if (events[eventName]) {
-			events[eventName].subscriptions = [];
-		}
-	};
+})();
 
-	return this;
+var Generation = (function () {
+	return function (eventor) {
+
+		var onCellToggled = function (row, col) {
+			console.log('onCellToggled');
+		};
+
+		eventor.subscribeEvent('cellToggled', onCellToggled);
+		return this;
+	};
 })();
 
 var Gol = (function (){
 	var
+		world = null,
+		generation = null,
 		supportedEvents = [
 			'cellToggled',
 			'cellAlive',
@@ -196,7 +214,9 @@ var Gol = (function (){
 
 			var
 				onUseClick = function () {
-					var world = new World(eventBridge);
+					world = new World(eventBridge),
+					generation = new Generation(eventBridge);
+
 					config.loadCounts();
 					world.renderWorld(config.getRows(), config.getCols());
 					action.show();
