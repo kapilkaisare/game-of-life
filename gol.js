@@ -66,10 +66,14 @@ var ActionPanel = (function () {
 			stopBtn.style.display = 'none';
 			resetBtn.style.display = 'none';
 		},
-		_init = function () {
+		_init = function (listeners) {
 			startBtn = document.getElementById(startBtnId);
 			stopBtn = document.getElementById(stopBtnId);
 			resetBtn = document.getElementById(resetBtnId);
+
+			startBtn.onclick = listeners.startClick;
+			stopBtn.onclick = listeners.stopClick;
+			resetBtn.onclick = listeners.resetClick;
 
 			this.hide();
 		};
@@ -103,7 +107,7 @@ var World = (function () {
 			renderRow = function (row, col) {
 				var rowEl = document.createElement('tr');
 				rowEl.setAttribute('id', constructRowId(row));
-				for (var i = 1; i <= col; i++) {
+				for (var i = 0; i < col; i++) {
 					rowEl.appendChild(renderCell(row, i));
 				}
 				return rowEl;
@@ -132,7 +136,7 @@ var World = (function () {
 			this.worldHolder = document.getElementById(renderContainerId);
 			this.clearWorld();
 
-			for (var i = 1; i <= rows; i++) {
+			for (var i = 0; i < rows; i++) {
 				table.appendChild(renderRow(i, cols));
 			}
 
@@ -212,85 +216,85 @@ var Generation = (function () {
 				return row;
 			},
 			getNorthNeighbor = function (row, col) {
-				if (this.state[row -1] && this.state[row - 1][col]) {
-					return this.state[row - 1][col];
+				if (that.state[row -1] && that.state[row - 1][col]) {
+					return that.state[row - 1][col];
 				} else {
 					return false;
 				}
 			},
 			getNorthEastNeighbor = function (row, col) {
-				if (this.state[row -1] && this.state[row - 1][col + 1]) {
-					return this.state[row - 1][col + 1];
+				if (that.state[row -1] && that.state[row - 1][col + 1]) {
+					return that.state[row - 1][col + 1];
 				} else {
 					return false;
 				}
 			},
 			getEastNeighbor = function (row, col) {
-				if (this.state[row] && this.state[row - 1][col + 1]) {
-					return this.state[row][col + 1];
+				if (that.state[row] && that.state[row][col + 1]) {
+					return that.state[row][col + 1];
 				} else {
 					return false;
 				}
 			},
 			getSouthEastNeighbor = function (row, col) {
-				if (this.state[row + 1] && this.state[row + 1][col + 1]) {
-					return this.state[row + 1][col + 1];
+				if (that.state[row + 1] && that.state[row + 1][col + 1]) {
+					return that.state[row + 1][col + 1];
 				} else {
 					return false;
 				}
 			},
 			getSouthNeighbor = function (row, col) {
-				if (this.state[row + 1] && this.state[row + 1][col]) {
-					return this.state[row + 1][col];
+				if (that.state[row + 1] && that.state[row + 1][col]) {
+					return that.state[row + 1][col];
 				} else {
 					return false;
 				}
 			},
 			getSouthWestNeighbor = function (row, col) {
-				if (this.state[row + 1] && this.state[row + 1][col - 1]) {
-					return this.state[row + 1][col - 1];
+				if (that.state[row + 1] && that.state[row + 1][col - 1]) {
+					return that.state[row + 1][col - 1];
 				} else {
 					return false;
 				}
 			},
 			getWestNeighbor = function (row, col) {
-				if (this.state[row] && this.state[row][col - 1]) {
-					return this.state[row][col - 1];
+				if (that.state[row] && that.state[row][col - 1]) {
+					return that.state[row][col - 1];
 				} else {
 					return false;
 				}
 			},
 			getNorthWestNeighbor = function (row, col) {
-				if (this.state[row - 1] && this.state[row - 1][col - 1]) {
-					return this.state[row - 1][col - 1];
+				if (that.state[row - 1] && that.state[row - 1][col - 1]) {
+					return that.state[row - 1][col - 1];
 				} else {
 					return false;
 				}
 			},
 			findNeighborCountForCellAt = function (row, col){
 				var neighborCount = 0;
-				if (getNorthNeighbor() && getNorthNeighbor().isAlive) {
+				if (getNorthNeighbor(row, col) && getNorthNeighbor(row, col).isAlive) {
 					neighborCount = neighborCount + 1;
 				}
-				if (getNorthWestNeighbor() && getNorthWestNeighbor().isAlive) {
+				if (getNorthWestNeighbor(row, col) && getNorthWestNeighbor(row, col).isAlive) {
 					neighborCount = neighborCount + 1;
 				}
-				if (getNorthEastNeighbor() && getNorthEastNeighbor().isAlive) {
+				if (getNorthEastNeighbor(row, col) && getNorthEastNeighbor(row, col).isAlive) {
 					neighborCount = neighborCount + 1;
 				}
-				if (getWestNeighbor() && getWestNeighbor().isAlive) {
+				if (getWestNeighbor(row, col) && getWestNeighbor(row, col).isAlive) {
 					neighborCount = neighborCount + 1;
 				}
-				if (getEastNeighbor() && getEastNeighbor().isAlive) {
+				if (getEastNeighbor(row, col) && getEastNeighbor(row, col).isAlive) {
 					neighborCount = neighborCount + 1;
 				}
-				if (getSouthNeighbor() && getSouthNeighbor().isAlive) {
+				if (getSouthNeighbor(row, col) && getSouthNeighbor(row, col).isAlive) {
 					neighborCount = neighborCount + 1;
 				}
-				if (getSouthWestNeighbor() && getSouthWestNeighbor().isAlive) {
+				if (getSouthWestNeighbor(row, col) && getSouthWestNeighbor(row, col).isAlive) {
 					neighborCount = neighborCount + 1;
 				}
-				if (getSouthEastNeighbor() && getSouthEastNeighbor().isAlive) {
+				if (getSouthEastNeighbor(row, col) && getSouthEastNeighbor(row, col).isAlive) {
 					neighborCount = neighborCount + 1;
 				}
 				return neighborCount;
@@ -305,6 +309,9 @@ var Generation = (function () {
 				this.state = [];
 				for (var i = 0; i < cols; i++) {
 					this.state.push(makeRow(cols));
+					for (var j = 0; j < cols; j++) {
+						eventor.fireEvent('cellDead', i, j);
+					}
 				}
 		};
 
@@ -314,6 +321,7 @@ var Generation = (function () {
 				this.nextState[i] = [];
 				for (var j = 0, n = this.state[i].length; j < n; j++) {
 					var neighborCount = findNeighborCountForCellAt(i, j);
+					this.nextState[i][j] = null;
 					if (this.state[i][j].isAlive && neighborCount < 2) {
 						this.nextState[i][j] = new State(false);
 						eventor.fireEvent('cellDead', i, j);
@@ -326,10 +334,13 @@ var Generation = (function () {
 					} else if (!this.state[i][j].isAlive && neighborCount == 3) {
 						this.nextState[i][j] = new State(true);
 						eventor.fireEvent('cellAlive', i, j);
+					} else {
+						this.nextState[i][j] = new State(false);
+						eventor.fireEvent('cellDead', i, j);
 					}
 				}
 			}
-			this.state = this.nextState;
+			this.state = JSON.parse(JSON.stringify(this.nextState));
 		};
 
 		return this;
@@ -353,21 +364,47 @@ var Gol = (function (){
 			}
 
 			var
+				running = false,
+				generateNewState = function () {
+					generation.computeNextState();
+				},
+				runGenerations = function () {
+					if (running) {
+						generateNewState();
+						setTimeout(runGenerations, 1000);
+					}
+				},
 				onUseClick = function () {
 					world = new World(eventBridge);
 					generation = new Generation(eventBridge);
 
 					config.loadCounts();
-					generation.make(config.getRows(), config.getCols());
 					world.renderWorld(config.getRows(), config.getCols());
+					generation.make(config.getRows(), config.getCols());
 					action.show();
 				},
+				onStartClick = function () {
+					running = true;
+					runGenerations();
+				},
+				onStopClick = function () {
+					running = false;
+				},
+				onResetClick = function() {
+					running - false;
+					generation.make(config.getRows(), config.getCols());
+				};
 				configListeners = {
 					useClick: onUseClick
+				},
+				actionListeners = {
+					startClick: onStartClick,
+					stopClick: onStopClick,
+					resetClick: onResetClick
 				};
 
 			config.init(configListeners);
-			action.init();
+			action.init(actionListeners);
 		};
 
 	return {
