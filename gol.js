@@ -96,7 +96,6 @@ var World = (function () {
 				cell.style.padding = '5px';
 				cell.style.border = 'solid 1px';
 				cell.onclick = function () {
-					console.log('onclick');
 					eventor.fireEvent('cellToggled', row, col);
 				};
 				return cell;
@@ -110,6 +109,7 @@ var World = (function () {
 				return rowEl;
 			},
 			onCellAlive = function (row, col) {
+				console.log('onCellAlive');
 				document.getElementById(constructCellId(row, col)).style.background = '#000000';
 			},
 			onCellDead = function (row, col) {
@@ -166,9 +166,10 @@ var Eventor = (function () {
 		};
 
 		this.fireEvent = function (eventName) {
+			var args = Array.prototype.slice.call(arguments, 1);
 			if (events[eventName]) {
 				for (var i = 0, n = events[eventName].subscriptions.length; i < n; i++) {
-					events[eventName].subscriptions[i]();
+					events[eventName].subscriptions[i].apply(this, args);
 				}
 			}
 		};
@@ -189,6 +190,7 @@ var Generation = (function () {
 
 		var onCellToggled = function (row, col) {
 			console.log('onCellToggled');
+			eventor.fireEvent('cellAlive', row, col);
 		};
 
 		eventor.subscribeEvent('cellToggled', onCellToggled);
