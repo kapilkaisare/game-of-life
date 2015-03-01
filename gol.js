@@ -155,7 +155,7 @@ var Eventor = (function () {
 		this.registerEvent = function (eventName) {
 			events[eventName] = {
 				subscriptions: []
-			}
+			};
 		};
 
 		this.subscribeEvent = function (eventName, func) {
@@ -210,6 +210,90 @@ var Generation = (function () {
 					row.push(new State(false));
 				}
 				return row;
+			},
+			getNorthNeighbor = function (row, col) {
+				if (this.state[row -1] && this.state[row - 1][col]) {
+					return this.state[row - 1][col];
+				} else {
+					return false;
+				}
+			},
+			getNorthEastNeighbor = function (row, col) {
+				if (this.state[row -1] && this.state[row - 1][col + 1]) {
+					return this.state[row - 1][col + 1];
+				} else {
+					return false;
+				}
+			},
+			getEastNeighbor = function (row, col) {
+				if (this.state[row] && this.state[row - 1][col + 1]) {
+					return this.state[row][col + 1];
+				} else {
+					return false;
+				}
+			},
+			getSouthEastNeighbor = function (row, col) {
+				if (this.state[row + 1] && this.state[row + 1][col + 1]) {
+					return this.state[row + 1][col + 1];
+				} else {
+					return false;
+				}
+			},
+			getSouthNeighbor = function (row, col) {
+				if (this.state[row + 1] && this.state[row + 1][col]) {
+					return this.state[row + 1][col];
+				} else {
+					return false;
+				}
+			},
+			getSouthWestNeighbor = function (row, col) {
+				if (this.state[row + 1] && this.state[row + 1][col - 1]) {
+					return this.state[row + 1][col - 1];
+				} else {
+					return false;
+				}
+			},
+			getWestNeighbor = function (row, col) {
+				if (this.state[row] && this.state[row][col - 1]) {
+					return this.state[row][col - 1];
+				} else {
+					return false;
+				}
+			},
+			getNorthWestNeighbor = function (row, col) {
+				if (this.state[row - 1] && this.state[row - 1][col - 1]) {
+					return this.state[row - 1][col - 1];
+				} else {
+					return false;
+				}
+			},
+			findNeighborCountForCellAt = function (row, col){
+				var neighborCount = 0;
+				if (getNorthNeighbor() && getNorthNeighbor().isAlive) {
+					neighborCount = neighborCount + 1;
+				}
+				if (getNorthWestNeighbor() && getNorthWestNeighbor().isAlive) {
+					neighborCount = neighborCount + 1;
+				}
+				if (getNorthEastNeighbor() && getNorthEastNeighbor().isAlive) {
+					neighborCount = neighborCount + 1;
+				}
+				if (getWestNeighbor() && getWestNeighbor().isAlive) {
+					neighborCount = neighborCount + 1;
+				}
+				if (getEastNeighbor() && getEastNeighbor().isAlive) {
+					neighborCount = neighborCount + 1;
+				}
+				if (getSouthNeighbor() && getSouthNeighbor().isAlive) {
+					neighborCount = neighborCount + 1;
+				}
+				if (getSouthWestNeighbor() && getSouthWestNeighbor().isAlive) {
+					neighborCount = neighborCount + 1;
+				}
+				if (getSouthEastNeighbor() && getSouthEastNeighbor().isAlive) {
+					neighborCount = neighborCount + 1;
+				}
+				return neighborCount;
 			};
 
 		eventor.subscribeEvent('cellToggled', onCellToggled);
@@ -245,7 +329,7 @@ var Gol = (function (){
 
 			var
 				onUseClick = function () {
-					world = new World(eventBridge),
+					world = new World(eventBridge);
 					generation = new Generation(eventBridge);
 
 					config.loadCounts();
