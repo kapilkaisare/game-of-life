@@ -299,12 +299,37 @@ var Generation = (function () {
 		eventor.subscribeEvent('cellToggled', onCellToggled);
 
 		this.state = null;
+		this.nextState = null;
 
 		this.make = function (rows, cols) {
 				this.state = [];
 				for (var i = 0; i < cols; i++) {
 					this.state.push(makeRow(cols));
 				}
+		};
+
+		this.computeNextState = function () {
+			this.nextState = [];
+			for (var i = 0, m = this.state.length; i < m; i++) {
+				this.nextState[i] = [];
+				for (var j = 0, n = this.state[i].length; j < n; j++) {
+					var neighborCount = findNeighborCountForCellAt(i, j);
+					if (this.state[i][j].isAlive && neighborCount < 2) {
+						this.nextState[i][j] = new State(false);
+						eventor.fireEvent('cellDead', i, j);
+					} else if (this.state[i][j].isAlive && (neighborCount == 2 || neighborCount == 3)) {
+						this.nextState[i][j] = new State(true);
+						eventor.fireEvent('cellAlive', i, j);
+					} else if (this.state[i][j].isAlive && neighborCount > 3) {
+						this.nextState[i][j] = new State(false);
+						eventor.fireEvent('cellDead', i, j);
+					} else if (!this.state[i][j].isAlive && neighborCount == 3) {
+						this.nextState[i][j] = new State(true);
+						eventor.fireEvent('cellAlive', i, j);
+					}
+				}
+			}
+			this.state = this.nextState;
 		};
 
 		return this;
